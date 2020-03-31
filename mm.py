@@ -28,13 +28,7 @@ data = {
     "development_requires": [
         "pytest-flake8",
         "flake8",
-        "ipdb",
         "tox",
-        "mkdocs",
-        "mkdocs-material",
-        "pymdown-extensions",
-        "pygments",
-        "pygments-github-lexers",
     ],
     "entry_points": "",
 
