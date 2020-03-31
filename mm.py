@@ -2,7 +2,7 @@ data = {
     "title": "Proper Config",
     "name": "proper_config",
     "pypi_name": "proper_config",
-    "version": "0.200331",
+    "version": "1.200331",
     "author": "Juan-Pablo Scaletti",
     "author_email": "juanpablo@jpscaletti.com",
     "description": "Config system for web apps.",
@@ -14,7 +14,7 @@ data = {
     #     "Documentation": "https://github.com/jpscaletti/proper-form",
     # },
 
-    "development_status": "4 - Beta",
+    "development_status": "5 - Production/Stable",
     "minimal_python": 3.6,
     "install_requires": [
         "cryptography ~= 2.5",
