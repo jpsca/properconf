@@ -2,7 +2,8 @@ from pathlib import Path
 import copy
 import yaml
 
-from .secrets import read_secrets, DEFAULT_SECRETS
+from .defaults import DEFAULT_SECRETS
+from .secrets import read_secrets
 
 
 class ConfigDict(dict):
@@ -63,7 +64,7 @@ class ConfigDict(dict):
 
     def load_secrets(self, secrets_path, default=DEFAULT_SECRETS):
         """Load values from a YAML file, and decrypt those values using a
-        `master.key` that should be in the same folder.
+        key file that should be in the same folder.
         """
         secrets_path = Path(secrets_path)
         if secrets_path.is_file():

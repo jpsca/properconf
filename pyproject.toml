@@ -16,6 +16,7 @@ python = "^3.6"
 cryptography = "^2.9.2"
 pyyaml = "^5.1"
 texteditor = "^1.1"
+pyceo = "^2.200711"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.4.3"
@@ -23,6 +24,9 @@ pytest-cov = "^2.10.0"
 flake8 = "^3.8.3"
 tox = "^3.17.1"
 black = "^19.10b0"
+
+[tool.poetry.scripts]
+properconf = "proper_config.cli:manager_run"
 
 [build-system]
 requires = ["poetry>=0.12"]

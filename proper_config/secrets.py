@@ -5,16 +5,6 @@ from cryptography.fernet import Fernet
 import texteditor
 
 
-DEFAULT_SECRETS = """
-# This is an encrypted YAML file.
-#
-# Your can safely store here credentials like API keys and such,
-# and commit this file to your source version control system.
-# -------------------------------------------------------------
-
-# foo: "bar"
-"""
-
 MASTER_KEY_FILE = "master.key"
 MASTER_KEY_ENV = "MASTER_KEY"
 
@@ -54,12 +44,12 @@ def edit_secrets(
     print(outro)
 
 
-def generate_master_key():
+def generate_key():
     return Fernet.generate_key()
 
 
 def new_master_key_file(parent_path, master_key_file=MASTER_KEY_FILE):
-    master_key = generate_master_key()
+    master_key = generate_key()
     (Path(parent_path) / master_key_file).write_bytes(master_key)
     return master_key
 
@@ -80,7 +70,7 @@ def read_secrets(
             The path to an encripted secrets file.
 
         master_key (str):
-            If not provided, it's assumed that the master key
+            If not provided, it's assumed that the master_key
             is in the same folder or in an environment variable.
 
     Returns (str):
@@ -115,7 +105,7 @@ def save_secrets(
     Arguments are:
 
         secrets_path (str):
-            The path to an encripted secrets file. It's assumed that the master key
+            The path to an encripted secrets file. It's assumed that the master_key
             is in the same folder or in an environment variable.
 
         content (str):
@@ -148,17 +138,14 @@ def read_master_key(
 ):
     master_key = os.getenv(master_key_env, "").strip().encode("utf8")
     if not master_key:
-        key_path = Path(parent_path) / master_key_file
-        if key_path.is_file():
-            master_key = key_path.read_bytes().strip()
+        master_key_path = Path(parent_path) / master_key_file
+        if master_key_path.is_file():
+            master_key = master_key_path.read_bytes().strip()
 
     if error_if_not_found and not master_key:
         raise IOError(
-            "Master key not found. Either load a `"
-            + master_key_file
-            + "`beside your secrets file, or set and environment variable `"
-            + master_key_env
-            + "` with the master key value (the environment variable takes "
-            + "precendence over the file)."
+            f"Key not found. Either put a `{master_key_file}` beside your secrets file,"
+            f" or set and environment variable `{master_key_env}` with the master_key"
+            " value (the environment variable takes precendence over the file)."
         )
     return master_key

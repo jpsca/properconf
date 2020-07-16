@@ -6,33 +6,33 @@ from proper_config import secrets
 
 
 def test_new_master_key_file(dst):
-    master_key = secrets.new_master_key_file(dst)
+    key = secrets.new_master_key_file(dst)
     key_path = dst / secrets.MASTER_KEY_FILE
 
     assert key_path.is_file()
-    assert key_path.read_bytes() == master_key
+    assert key_path.read_bytes() == key
 
 
 def test_read_master_key_from_file(dst):
-    master_key = secrets.new_master_key_file(dst)
-    assert secrets.read_master_key(dst) == master_key
+    key = secrets.new_master_key_file(dst)
+    assert secrets.read_master_key(dst) == key
 
 
 def test_read_master_key_from_env(dst):
-    master_key = secrets.generate_master_key()
-    os.environ[secrets.MASTER_KEY_ENV] = master_key.decode("utf8")
-    assert secrets.read_master_key(dst) == master_key
+    key = secrets.generate_key()
+    os.environ[secrets.MASTER_KEY_ENV] = key.decode("utf8")
+    assert secrets.read_master_key(dst) == key
     del os.environ[secrets.MASTER_KEY_ENV]
 
 
-def test_master_key_env_over_file(dst):
-    master_key_env = secrets.generate_master_key()
-    os.environ[secrets.MASTER_KEY_ENV] = master_key_env.decode("utf8")
+def test_key_env_over_file(dst):
+    key_env = secrets.generate_key()
+    os.environ[secrets.MASTER_KEY_ENV] = key_env.decode("utf8")
 
-    master_key_file = secrets.new_master_key_file(dst)
+    key_file = secrets.new_master_key_file(dst)
 
-    assert master_key_file != master_key_env
-    assert secrets.read_master_key(dst) == master_key_env
+    assert key_file != key_env
+    assert secrets.read_master_key(dst) == key_env
     del os.environ[secrets.MASTER_KEY_ENV]
 
 
@@ -53,7 +53,7 @@ def test_read_empty_secrets(dst):
     assert secrets.read_secrets(secrets_path) == ""
 
 
-def test_read_empty_secrets_no_master_key(dst):
+def test_read_empty_secrets_no_key(dst):
     secrets_path = dst / "secrets.enc"
     secrets_path.touch()
 
@@ -67,7 +67,7 @@ def test_read_no_secrets(dst):
         secrets.read_secrets(secrets_path)
 
 
-def test_read_secrets_but_no_master_key(dst):
+def test_read_secrets_but_no_key(dst):
     secrets_path = dst / "secrets.enc"
     secrets_path.write_text("whatever")
 
