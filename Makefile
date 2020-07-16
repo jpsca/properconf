@@ -3,7 +3,7 @@ all: PHONY
 help:
 	@echo "clean - remove build/python artifacts"
 	@echo "test - run tests"
-	@echo "flake - check style with flake8"
+	@echo "lint - check style with flake8"
 	@echo "coverage - generate an HTML report of the coverage"
 	@echo "install - install for development"
 
@@ -26,11 +26,11 @@ clean-pyc:
 test:
 	pytest -x proper_config tests
 
-flake:
+lint:
 	flake8 --config=setup.cfg proper_config tests
 
 coverage:
 	pytest --cov-report html --cov proper_config proper_config tests
 
 install:
-	pip install -e .[dev]
+	poetry install
