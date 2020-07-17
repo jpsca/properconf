@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "properconf"
-version = "1.200717"
+version = "1.200718"
 description = "A modest config system"
 authors = ["Juan-Pablo Scaletti <juanpablo@jpscaletti.com>"]
 license = "APACHE-2.0"
