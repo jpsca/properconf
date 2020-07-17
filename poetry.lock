@@ -238,7 +238,7 @@ description = "A minimal and ridiculously good looking command-line-interface to
 name = "pyceo"
 optional = false
 python-versions = ">=3.6,<4.0"
-version = "2.200711"
+version = "2.200716"
 
 [package.dependencies]
 colorama = ">=0.4.3,<0.5.0"
@@ -602,8 +602,8 @@ py = [
     {file = "py-1.9.0.tar.gz", hash = "sha256:9ca6883ce56b4e8da7e79ac18787889fa5206c79dcc67fb065376cd2fe03f342"},
 ]
 pyceo = [
-    {file = "pyceo-2.200711-py3-none-any.whl", hash = "sha256:df00b15952d01228f395f415a08f9f11a40e68ffa975f2bc5586c8b3afda7e5e"},
-    {file = "pyceo-2.200711.tar.gz", hash = "sha256:d7a2d272b5a890689e0150794f64edca43c49fd86d449ef5b04845d60a78e971"},
+    {file = "pyceo-2.200716-py3-none-any.whl", hash = "sha256:3586b3053672a90897754b5c7d0f54eca81ae2093d7b34462d0a23c24a77de7a"},
+    {file = "pyceo-2.200716.tar.gz", hash = "sha256:a5c117f17d849748c179a4256e9417bd94e568552315351f57d5e95e7322f3dc"},
 ]
 pycodestyle = [
     {file = "pycodestyle-2.6.0-py2.py3-none-any.whl", hash = "sha256:2295e7b2f6b5bd100585ebcb1f616591b652db8a741695b3d8f5d28bdc934367"},

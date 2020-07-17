@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from proper_config import secrets
+from properconf import secrets
 
 
 def test_new_master_key_file(dst):

@@ -24,13 +24,13 @@ clean-pyc:
 	find . -name '.pytest_cache' -exec rm -rf {} +
 
 test:
-	pytest -x proper_config tests
+	pytest -x properconf tests
 
 lint:
-	flake8 --config=setup.cfg proper_config tests
+	flake8 --config=setup.cfg properconf tests
 
 coverage:
-	pytest --cov-report html --cov proper_config proper_config tests
+	pytest --cov-report html --cov properconf properconf tests
 
 install:
 	poetry install

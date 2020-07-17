@@ -12,5 +12,5 @@ matrix:
 
 before_install: pip install poetry coveralls
 install: poetry install
-script: pytest --cov proper_config --cov tests .
+script: pytest --cov properconf --cov tests .
 after_success: coveralls

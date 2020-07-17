@@ -1,6 +1,6 @@
 import pytest
 
-from proper_config import ConfigDict
+from properconf import ConfigDict
 
 
 def test_dict_init():

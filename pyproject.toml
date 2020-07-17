@@ -1,11 +1,11 @@
 [tool.poetry]
-name = "proper-config"
+name = "properconf"
 version = "1.200716"
 description = "A modest config system"
 authors = ["Juan-Pablo Scaletti <juanpablo@jpscaletti.com>"]
 license = "APACHE-2.0"
 readme = "README.md"
-repository = "https://github.com/jpsca/proper-config"
+repository = "https://github.com/jpsca/properconf"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers"
@@ -26,7 +26,7 @@ tox = "^3.17.1"
 black = "^19.10b0"
 
 [tool.poetry.scripts]
-properconf = "proper_config.cli:manager_run"
+properconf = "properconf.cli:manager_run"
 
 [build-system]
 requires = ["poetry>=0.12"]

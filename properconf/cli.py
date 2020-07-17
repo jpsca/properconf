@@ -17,7 +17,7 @@ from .version import __version__
 
 
 manager = Manager(
-    f"Proper-Config v{__version__}",
+    f"ProperConf v{__version__}",
     catch_errors=False
 )
 

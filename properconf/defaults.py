@@ -56,7 +56,7 @@ SECRET_KEY: "---- This is a fake secret key just for testing ----"
 
 DEFAULT_INIT = """from pathlib import Path
 
-from proper_config import ConfigDict
+from properconf import ConfigDict
 
 
 def load_config(env):

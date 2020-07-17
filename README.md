@@ -1,5 +1,5 @@
-# Proper Config
+# ProperConf
 
-Config system for web apps, including support for encrypted secrets.
+A modest config system, including support for encrypted secrets.
 
-[![](https://travis-ci.org/jpsca/proper-config.svg?branch=master)](https://travis-ci.org/jpsca/proper-config/) 
+[![](https://travis-ci.org/jpsca/properconf.svg?branch=master)](https://travis-ci.org/jpsca/properconf/) 
