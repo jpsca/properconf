@@ -4,11 +4,11 @@ python:
   - "3.6"
   - "3.7"
   - "3.8"
-  - "nightly"
+  - "3.9"
 
 matrix:
   allow_failures:
-    - python: "nightly"
+    - python: "3.9"
 
 before_install: pip install poetry coveralls
 install: poetry install
