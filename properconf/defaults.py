@@ -1,16 +1,3 @@
-import os
-import string
-
-
-CHARS = string.ascii_letters + string.digits + "&*"
-CHARS_LEN = 64
-SECRET_KEY_LEN = 64
-
-
-def generate_secret_key(key_len=SECRET_KEY_LEN):
-    return "".join([CHARS[ord(os.urandom(1)) % CHARS_LEN] for i in range(key_len)])
-
-
 DEFAULT_SECRETS = """# This is an encrypted YAML file.
 #
 # Your can safely store here credentials like API keys and such,
@@ -21,10 +8,7 @@ DEFAULT_SECRETS = """# This is an encrypted YAML file.
 """
 
 DEFAULT_DEVELOPMENT_SECRETS = DEFAULT_SECRETS
-
-
-def get_default_production_secrets():
-    return DEFAULT_SECRETS + f'SECRET_KEY: "{generate_secret_key()}"\n'
+DEFAULT_PRODUCTION_SECRETS = DEFAULT_SECRETS + 'SECRET_KEY: "<SECRET_KEY>"\n'
 
 
 DEFAULT_COMMON_CONFIG = """# Shared config
