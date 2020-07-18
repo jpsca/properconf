@@ -1,4 +1,5 @@
 import os
+import string
 from pathlib import Path
 
 from cryptography.fernet import Fernet
@@ -149,3 +150,12 @@ def read_master_key(
             " value (the environment variable takes precendence over the file)."
         )
     return master_key
+
+
+CHARS = string.ascii_letters + string.digits + "&*"
+CHARS_LEN = 64
+SECRET_LENGTH = 64
+
+
+def generate_token(length=SECRET_LENGTH):
+    return "".join([CHARS[ord(os.urandom(1)) % CHARS_LEN] for i in range(length)])

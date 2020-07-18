@@ -1,5 +1,3 @@
-import os
-import string
 from pathlib import Path
 
 from pyceo import Manager, param, option, confirm
@@ -14,14 +12,16 @@ from .defaults import (
     DEFAULT_TESTING_CONFIG,
     DEFAULT_PRODUCTION_SECRETS,
 )
-from .secrets import new_master_key_file, save_secrets
+from .secrets import (
+    new_master_key_file,
+    save_secrets,
+    generate_token as _generate_token,
+    SECRET_LENGTH,
+)
 from .version import __version__
 
 
-manager = Manager(
-    f"ProperConf v{__version__}",
-    catch_errors=False
-)
+manager = Manager(f"ProperConf v{__version__}", catch_errors=False)
 
 
 @manager.command()
@@ -45,10 +45,7 @@ def setup(path="./config", quiet=False, _app_env="APP_ENV"):
 
     _setup_init(root_path, _app_env, quiet=quiet)
     setup_env(
-        root_path,
-        config=DEFAULT_COMMON_CONFIG,
-        secrets=None,
-        quiet=quiet,
+        root_path, config=DEFAULT_COMMON_CONFIG, secrets=None, quiet=quiet,
     )
     setup_env(
         root_path / "development",
@@ -64,10 +61,7 @@ def setup(path="./config", quiet=False, _app_env="APP_ENV"):
         quiet=quiet,
     )
     setup_env(
-        root_path / "testing",
-        config=DEFAULT_TESTING_CONFIG,
-        secrets=None,
-        quiet=quiet,
+        root_path / "testing", config=DEFAULT_TESTING_CONFIG, secrets=None, quiet=quiet,
     )
     print("All done! ✨ 🍰 ✨")
 
@@ -118,25 +112,18 @@ def setup_secrets(path, secrets=DEFAULT_SECRETS, quiet=False):
         print(f"Creating {str(fpath)}")
     key_file = new_master_key_file(path)
     save_secrets(
-        secrets_path=fpath,
-        content=secrets,
-        master_key=key_file,
+        secrets_path=fpath, content=secrets, master_key=key_file,
     )
-
-
-CHARS = string.ascii_letters + string.digits + "&*"
-CHARS_LEN = 64
-SECRET_LENGTH = 64
-
-
-def _generate_token(length=SECRET_LENGTH):
-    return "".join([CHARS[ord(os.urandom(1)) % CHARS_LEN] for i in range(length)])
 
 
 @manager.command()
 @option("length", help="Length of the secret")
-def generate_secret_token(length=SECRET_LENGTH):
-    """Generate a secure secret"""
+def generate_token(length=SECRET_LENGTH):
+    """Generate a secure secret token.
+
+    This value is ideal for a "SECRET_KEY" used
+    to sign authentication cookies or similar tasks.
+    """
     print(_generate_token(length))
 
 
