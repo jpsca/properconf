@@ -33,4 +33,4 @@ coverage:
 	pytest --cov-report html --cov properconf properconf tests
 
 install:
-	poetry install
+	pip install -e .[dev]

@@ -5,7 +5,7 @@ python:
   - "3.7"
   - "3.8"
 
-before_install: pip install poetry coveralls
-install: poetry install
+before_install: pip install -U pip coveralls
+install: pip install .[test]
 script: pytest --cov properconf --cov tests .
 after_success: coveralls
