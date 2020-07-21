@@ -6,6 +6,19 @@ from cryptography.fernet import Fernet
 import texteditor
 
 
+__all__ = (
+    "MASTER_KEY_FILE",
+    "MASTER_KEY_ENV",
+    "SecretsNotFound",
+    "edit_secrets",
+    "generate_key",
+    "new_master_key_file",
+    "read_secrets",
+    "save_secrets",
+    "read_master_key",
+    "generate_token",
+)
+
 MASTER_KEY_FILE = "master.key"
 MASTER_KEY_ENV = "MASTER_KEY"
 

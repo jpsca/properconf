@@ -2,6 +2,7 @@ from pathlib import Path
 
 from pyceo import Manager, param, option, confirm
 
+from . import secrets as sec
 from .defaults import (
     DEFAULT_INIT,
     DEFAULT_COMMON_CONFIG,
@@ -12,19 +13,14 @@ from .defaults import (
     DEFAULT_TESTING_CONFIG,
     DEFAULT_PRODUCTION_SECRETS,
 )
-from .secrets import (
-    new_master_key_file,
-    save_secrets,
-    generate_token as _generate_token,
-    SECRET_LENGTH,
-)
 from .version import __version__
 
 
+ENCRYPTED_FILE = "secrets.yaml.enc"
 manager = Manager(f"ProperConf v{__version__}", catch_errors=False)
 
 
-@manager.command()
+@manager.command(group="setup", name="all")
 @option("path", help="Where to create the new project (default is ./config).")
 @option("quiet", help="Print nothing to the console.")
 def setup(path="./config", quiet=False, _app_env="APP_ENV"):
@@ -53,7 +49,7 @@ def setup(path="./config", quiet=False, _app_env="APP_ENV"):
         secrets=DEFAULT_DEVELOPMENT_SECRETS,
         quiet=quiet,
     )
-    secrets = DEFAULT_PRODUCTION_SECRETS.replace("<SECRET_KEY>", _generate_token())
+    secrets = DEFAULT_PRODUCTION_SECRETS.replace("<SECRET_KEY>", sec.generate_token())
     setup_env(
         root_path / "production",
         config=DEFAULT_PRODUCTION_CONFIG,
@@ -66,7 +62,7 @@ def setup(path="./config", quiet=False, _app_env="APP_ENV"):
     print("All done! ✨ 🍰 ✨")
 
 
-@manager.command()
+@manager.command(group="setup", name="env")
 @param("path", help="Folder of the new environment.")
 @option("config", help="Optional content of the new config")
 @option("secrets", help="Optional (unencrypted) secret content. `None` to disable")
@@ -77,6 +73,7 @@ def setup_env(path, config="", secrets=DEFAULT_SECRETS, quiet=False):
     Use it if you need more than the defaults environments
     (development, production, and testing.)
     """
+    path = Path(path)
     path.mkdir(exist_ok=True, parents=True)
     _setup_config(path, config, quiet=quiet)
     if secrets is not None:
@@ -98,33 +95,46 @@ def _setup_config(path, config, quiet=False):
     fpath.write_text(config)
 
 
-@manager.command()
+@manager.command(group="setup", name="secrets")
 @param("path", help="Folder of the environment.")
 @option("secrets", help="Optional (unencrypted) secret content.")
 @option("quiet", help="Print nothing to the console.")
 def setup_secrets(path, secrets=DEFAULT_SECRETS, quiet=False):
     """Add a key and encrypted secrets to a folder.
     """
+    path = Path(path)
     if not path.exists():
         raise ValueError(f"{path} does not exists")
-    fpath = path / "secrets.yaml.enc"
+    fpath = path / ENCRYPTED_FILE
     if not quiet:
         print(f"Creating {str(fpath)}")
-    key_file = new_master_key_file(path)
-    save_secrets(
+    key_file = sec.new_master_key_file(path)
+    sec.save_secrets(
         secrets_path=fpath, content=secrets, master_key=key_file,
     )
 
 
 @manager.command()
+@param("path", help="Folder of the environment.")
+@option("default", help="Optional (unencrypted) default secrets.")
+def edit_secrets(path, default=None):
+    """Edit your encrypted secrets.
+    """
+    filepath = Path(path) / ENCRYPTED_FILE
+    if not filepath.exists():
+        raise ValueError(f"{filepath} does not exists")
+    sec.edit_secrets(filepath, default=default)
+
+
+@manager.command()
 @option("length", help="Length of the secret")
-def generate_token(length=SECRET_LENGTH):
+def generate_token(length=sec.SECRET_LENGTH):
     """Generate a secure secret token.
 
     This value is ideal for a "SECRET_KEY" used
     to sign authentication cookies or similar tasks.
     """
-    print(_generate_token(length))
+    print(sec.generate_token(length))
 
 
 @manager.command(name="--version")
