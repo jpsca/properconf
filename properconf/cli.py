@@ -5,7 +5,7 @@ from pyceo import Manager, param, option, confirm
 from . import secrets as sec
 from .defaults import (
     DEFAULT_INIT,
-    DEFAULT_COMMON_CONFIG,
+    DEFAULT_SHARED_CONFIG,
     DEFAULT_SECRETS,
     DEFAULT_DEVELOPMENT_SECRETS,
     DEFAULT_DEVELOPMENT_CONFIG,
@@ -41,7 +41,7 @@ def setup(path="./config", quiet=False, _app_env="APP_ENV"):
 
     _setup_init(root_path, _app_env, quiet=quiet)
     setup_env(
-        root_path, config=DEFAULT_COMMON_CONFIG, secrets=None, quiet=quiet,
+        root_path, config=DEFAULT_SHARED_CONFIG, secrets=None, quiet=quiet,
     )
     setup_env(
         root_path / "development",

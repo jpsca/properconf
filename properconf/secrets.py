@@ -1,4 +1,6 @@
+import copy
 import os
+import queue
 import string
 from pathlib import Path
 
@@ -18,6 +20,8 @@ __all__ = (
     "read_master_key",
     "generate_token",
 )
+
+Queue = getattr(queue, "SimpleQueue", "Queue")
 
 MASTER_KEY_FILE = "master.key"
 MASTER_KEY_ENV = "MASTER_KEY"
@@ -172,3 +176,27 @@ SECRET_LENGTH = 64
 
 def generate_token(length=SECRET_LENGTH):
     return "".join([CHARS[ord(os.urandom(1)) % CHARS_LEN] for i in range(length)])
+
+
+def get_skeleton(config, maxdepth=1, empty="..."):
+    """Takes a dict and return another with all the non-dict values
+    or those deeper than `maxdepth` replaced by `empty`.
+    """
+    dicts = Queue()
+    skeleton = copy.deepcopy(config)
+    dicts.put((0, skeleton))
+
+    while dicts.qsize() > 0:
+        level, dict_ = dicts.get()
+        for key, value in dict.items():
+            if level < maxdepth and isinstance(value, dict):
+                dicts.put((level + 1, value))
+                continue
+            dict_[key] = empty
+
+    return skeleton
+
+
+def dump_skeleton(suffix, skeleton):
+
+    return "\n#".join(text.split("\n"))
