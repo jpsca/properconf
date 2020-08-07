@@ -189,7 +189,7 @@ def generate_token(length=SECRET_LENGTH):
     return "".join([CHARS[ord(os.urandom(1)) % CHARS_LEN] for i in range(length)])
 
 
-def get_skeleton(config, maxdepth=1, empty="..."):
+def get_skeleton(config, maxdepth=2, empty="..."):
     """Takes a dict and return another with all the non-dict values
     or those deeper than `maxdepth` replaced by `empty`.
     """
@@ -216,5 +216,5 @@ def get_skeleton_header(content):
         return ""
 
     sk = get_skeleton(config)
-    text = toml.dumps(sk)
-    return "\n#".join(text.split("\n"))
+    text = toml.dumps(sk).strip()
+    return "#  " + "\n#  ".join(text.split("\n"))
