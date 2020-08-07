@@ -1,6 +1,7 @@
 from pathlib import Path
 import copy
-import yaml
+
+import toml
 
 from .defaults import DEFAULT_SECRETS
 from .secrets import read_secrets
@@ -53,7 +54,7 @@ class ConfigDict(dict):
         self._deepupdate(self, src)
 
     def load_file(self, path):
-        """Load values from a YAML file.
+        """Load values from a config file.
         """
         path = Path(path)
         if path.is_file():
@@ -63,7 +64,7 @@ class ConfigDict(dict):
         return self
 
     def load_secrets(self, secrets_path, default=DEFAULT_SECRETS):
-        """Load values from a YAML file, and decrypt those values using a
+        """Load values from a config file, and decrypt those values using a
         key file that should be in the same folder.
         """
         secrets_path = Path(secrets_path)
@@ -89,9 +90,8 @@ class ConfigDict(dict):
             else:
                 dict.__setitem__(target, key, copy.copy(value))
 
-    def _parse_content(self, _path, content):
-        # could be extended to load other file formats
-        data = yaml.safe_load(content) or {}
+    def _parse_content(self, path, content):
+        data = toml.loads(content) or {}
         if isinstance(data, dict):
             return data
-        raise ValueError("Invalid config at " + str(_path))
+        raise ValueError("Invalid config at " + str(path))

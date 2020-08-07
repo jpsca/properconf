@@ -1,8 +1,9 @@
+
 import os
 
 import pytest
 
-from properconf import secrets
+from properconf import secrets, defaults
 
 
 def test_new_master_key_file(dst):
@@ -57,7 +58,7 @@ def test_read_empty_secrets_no_key(dst):
     secrets_path = dst / "secrets.enc"
     secrets_path.touch()
 
-    assert secrets.read_secrets(secrets_path) == ""
+    assert secrets.read_secrets(secrets_path) == defaults.DEFAULT_SECRETS
 
 
 def test_read_no_secrets(dst):

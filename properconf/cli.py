@@ -16,7 +16,7 @@ from .defaults import (
 from .version import __version__
 
 
-ENCRYPTED_FILE = "secrets.yaml.enc"
+ENCRYPTED_FILE = "secrets.enc.toml"
 manager = Manager(f"ProperConf v{__version__}", catch_errors=False)
 
 
@@ -26,7 +26,7 @@ manager = Manager(f"ProperConf v{__version__}", catch_errors=False)
 def setup(path="./config", quiet=False, _app_env="APP_ENV"):
     """Setup a proper config project at `path` (./config is the default).
 
-    It will create a `common.yaml` and folders for development, production
+    It will create a `shared.toml` and folders for development, production
     and testing, with encripted secrets for development and production.
     """
     root_path = Path(path)
@@ -40,9 +40,8 @@ def setup(path="./config", quiet=False, _app_env="APP_ENV"):
     root_path.mkdir(exist_ok=True, parents=True)
 
     _setup_init(root_path, _app_env, quiet=quiet)
-    setup_env(
-        root_path, config=DEFAULT_SHARED_CONFIG, secrets=None, quiet=quiet,
-    )
+    (root_path / "shared.toml").write_text(DEFAULT_SHARED_CONFIG)
+
     setup_env(
         root_path / "development",
         config=DEFAULT_DEVELOPMENT_CONFIG,
@@ -89,7 +88,7 @@ def _setup_init(path, app_env, quiet=False):
 
 
 def _setup_config(path, config, quiet=False):
-    fpath = path / "config.yaml"
+    fpath = path / "config.toml"
     if not quiet:
         print(f"Creating {str(fpath)}")
     fpath.write_text(config)
@@ -131,7 +130,7 @@ def edit_secrets(path, default=None):
 def generate_token(length=sec.SECRET_LENGTH):
     """Generate a secure secret token.
 
-    This value is ideal for a "SECRET_KEY" used
+    This value is ideal for a "secret_key" used
     to sign authentication cookies or similar tasks.
     """
     print(sec.generate_token(length))
