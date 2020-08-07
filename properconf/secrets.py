@@ -1,11 +1,15 @@
 import copy
 import os
 import queue
+import re
 import string
 from pathlib import Path
 
 from cryptography.fernet import Fernet
 import texteditor
+import toml
+
+from .defaults import DEFAULT_SECRETS, DEFAULT_ENCRIPTED_HEADER
 
 
 __all__ = (
@@ -47,7 +51,6 @@ def edit_secrets(
     default=None,
     intro=EDIT_INTRO,
     outro=EDIT_OUTRO,
-    extension="yaml",
 ):
     """Edit your encrypted secrets in the default text editor.
     """
@@ -57,7 +60,7 @@ def edit_secrets(
     path.touch()
     content = read_secrets(path, default)
     print(intro)
-    new_content = texteditor.open(content, extension=extension)
+    new_content = texteditor.open(content, extension=path.suffix)
     save_secrets(path, new_content)
     print(outro)
 
@@ -70,6 +73,9 @@ def new_master_key_file(parent_path, master_key_file=MASTER_KEY_FILE):
     master_key = generate_key()
     (Path(parent_path) / master_key_file).write_bytes(master_key)
     return master_key
+
+
+RX_COMMENT =  re.compile(b"\s*#[^\n]*\n")
 
 
 def read_secrets(
@@ -97,9 +103,9 @@ def read_secrets(
 
     """
     secrets_path = Path(secrets_path)
-    enc_content = secrets_path.read_bytes()
+    enc_content = RX_COMMENT.sub(b"", secrets_path.read_bytes()).strip()
     if not enc_content:
-        return default
+        return DEFAULT_SECRETS
     master_key = master_key or read_master_key(
         secrets_path.parent,
         master_key_file=master_key_file,
@@ -145,7 +151,12 @@ def save_secrets(
         master_key_env=master_key_env,
     )
     enc_content = Fernet(master_key).encrypt(content.encode("utf8"))
-    secrets_path.write_bytes(enc_content)
+    secrets_path.write_bytes(DEFAULT_ENCRIPTED_HEADER)
+    skeleton_header = get_skeleton_header(content)
+    with secrets_path.open("ab") as f:
+        f.write(skeleton_header.encode("utf8"))
+        f.write(b"\n#\n")
+        f.write(enc_content)
 
 
 def read_master_key(
@@ -187,16 +198,23 @@ def get_skeleton(config, maxdepth=1, empty="..."):
     dicts.put((0, skeleton))
 
     while dicts.qsize() > 0:
-        level, dict_ = dicts.get()
-        for key, value in dict.items():
+        level, subdict = dicts.get()
+        for key, value in subdict.items():
             if level < maxdepth and isinstance(value, dict):
                 dicts.put((level + 1, value))
                 continue
-            dict_[key] = empty
+            subdict[key] = empty
 
     return skeleton
 
 
-def dump_skeleton(suffix, skeleton):
+def get_skeleton_header(content):
+    try:
+        config = toml.loads(content)
+    except toml.TomlDecodeError:
+        print("-- WARNING: The encrypted config has syntax errors and is not a valid TOML file.")
+        return ""
 
+    sk = get_skeleton(config)
+    text = toml.dumps(sk)
     return "\n#".join(text.split("\n"))
