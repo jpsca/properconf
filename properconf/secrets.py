@@ -75,7 +75,7 @@ def new_master_key_file(parent_path, master_key_file=MASTER_KEY_FILE):
     return master_key
 
 
-RX_COMMENT =  re.compile(b"\s*#[^\n]*\n")
+RX_COMMENT = re.compile(rb"\s*#[^\n]*\n")
 
 
 def read_secrets(
@@ -212,7 +212,7 @@ def get_skeleton_header(content):
     try:
         config = toml.loads(content)
     except toml.TomlDecodeError:
-        print("-- WARNING: The encrypted config has syntax errors and is not a valid TOML file.")
+        print("-- WARNING: The encrypted config has syntax errors and isn't a valid TOML file.")
         return ""
 
     sk = get_skeleton(config)
