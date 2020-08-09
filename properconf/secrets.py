@@ -31,6 +31,16 @@ MASTER_KEY_FILE = "master.key"
 MASTER_KEY_ENV = "MASTER_KEY"
 
 
+def fix_issue_308(self, memo):
+    """Temprorary fix until is merged upstream.
+    https://github.com/uiri/toml/issues/308
+    """
+    return self.__class__(self._raw_offset)
+
+
+toml.tz.TomlTz.__deepcopy__ = fix_issue_308
+
+
 class SecretsNotFound(Exception):
     def __init__(self, path):
         message = (
