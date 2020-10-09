@@ -22,8 +22,9 @@ manager = Manager(f"ProperConf v{__version__}", catch_errors=False)
 
 @manager.command(group="setup", name="all")
 @option("path", help="Where to create the new project (default is ./config).")
+@option("split", help="Use a different master.key for each environment")
 @option("quiet", help="Print nothing to the console.")
-def setup(path="./config", quiet=False, _app_env="APP_ENV"):
+def setup_all(path="./config", split=False, quiet=False, _app_env="APP_ENV"):
     """Setup a proper config project at `path` (./config is the default).
 
     It will create a `shared.toml` and folders for development, production
@@ -40,33 +41,56 @@ def setup(path="./config", quiet=False, _app_env="APP_ENV"):
     root_path.mkdir(exist_ok=True, parents=True)
 
     _setup_init(root_path, _app_env, quiet=quiet)
-    (root_path / "shared.toml").write_text(DEFAULT_SHARED_CONFIG)
 
-    setup_env(
-        root_path / "development",
-        config=DEFAULT_DEVELOPMENT_CONFIG,
-        secrets=DEFAULT_DEVELOPMENT_SECRETS,
-        quiet=quiet,
-    )
-    secrets = DEFAULT_PRODUCTION_SECRETS.replace("<SECRET_KEY>", sec.generate_token())
-    setup_env(
-        root_path / "production",
-        config=DEFAULT_PRODUCTION_CONFIG,
-        secrets=secrets,
-        quiet=quiet,
-    )
+    shared_config = root_path / "shared.toml"
+    if not quiet:
+        print(f"Creating {str(shared_config)}")
+    shared_config.write_text(DEFAULT_SHARED_CONFIG)
+
+    if split:
+        setup_split(root_path, quiet)
+    else:
+        setup_shared(root_path, quiet)
+
     setup_env(
         root_path / "testing", config=DEFAULT_TESTING_CONFIG, secrets=None, quiet=quiet,
     )
     print("All done! ✨ 🍰 ✨")
 
 
+def setup_shared(root_path, quiet):
+    if not quiet:
+        print(f"Creating {str(root_path / sec.MASTER_KEY_FILE)}")
+    master_key = sec.new_master_key_file(root_path)
+    setup_split(root_path, quiet, master_key)
+
+
+def setup_split(root_path, quiet, master_key=None):
+    setup_env(
+        root_path / "development",
+        config=DEFAULT_DEVELOPMENT_CONFIG,
+        secrets=DEFAULT_DEVELOPMENT_SECRETS,
+        master_key=master_key,
+        quiet=quiet,
+    )
+
+    secrets = DEFAULT_PRODUCTION_SECRETS.replace("<SECRET_KEY>", sec.generate_token())
+    setup_env(
+        root_path / "production",
+        config=DEFAULT_PRODUCTION_CONFIG,
+        secrets=secrets,
+        master_key=master_key,
+        quiet=quiet,
+    )
+
+
 @manager.command(group="setup", name="env")
 @param("path", help="Folder of the new environment.")
 @option("config", help="Optional content of the new config")
 @option("secrets", help="Optional (unencrypted) secret content. `None` to disable")
+@option("master_key", help="Optional master key")
 @option("quiet", help="Print nothing to the console.")
-def setup_env(path, config="", secrets=DEFAULT_SECRETS, quiet=False):
+def setup_env(path, config="", secrets=DEFAULT_SECRETS, master_key=None, quiet=False):
     """Setup a new env folder with config and secrets.
 
     Use it if you need more than the defaults environments
@@ -76,7 +100,7 @@ def setup_env(path, config="", secrets=DEFAULT_SECRETS, quiet=False):
     path.mkdir(exist_ok=True, parents=True)
     _setup_config(path, config, quiet=quiet)
     if secrets is not None:
-        setup_secrets(path, secrets, quiet=quiet)
+        setup_secrets(path, secrets, master_key=master_key, quiet=quiet)
 
 
 def _setup_init(path, app_env, quiet=False):
@@ -97,8 +121,9 @@ def _setup_config(path, config, quiet=False):
 @manager.command(group="setup", name="secrets")
 @param("path", help="Folder of the environment.")
 @option("secrets", help="Optional (unencrypted) secret content.")
+@option("master_key", help="Optional master key")
 @option("quiet", help="Print nothing to the console.")
-def setup_secrets(path, secrets=DEFAULT_SECRETS, quiet=False):
+def setup_secrets(path, secrets=DEFAULT_SECRETS, master_key=None, quiet=False):
     """Add a key and encrypted secrets to a folder.
     """
     path = Path(path)
@@ -107,9 +132,14 @@ def setup_secrets(path, secrets=DEFAULT_SECRETS, quiet=False):
     fpath = path / ENCRYPTED_FILE
     if not quiet:
         print(f"Creating {str(fpath)}")
-    key_file = sec.new_master_key_file(path)
+
+    if not master_key:
+        if not quiet:
+            print(f"Creating {str(path / sec.MASTER_KEY_FILE)}")
+        master_key = sec.new_master_key_file(path)
+
     sec.save_secrets(
-        secrets_path=fpath, content=secrets, master_key=key_file,
+        secrets_path=fpath, content=secrets, master_key=master_key,
     )
 
 

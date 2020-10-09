@@ -1,6 +1,6 @@
+import shutil
 from pathlib import Path
 from tempfile import mkdtemp
-import shutil
 
 import pytest
 

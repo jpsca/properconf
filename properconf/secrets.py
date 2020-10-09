@@ -44,14 +44,16 @@ toml.tz.TomlTz.__deepcopy__ = fix_issue_308
 class SecretsNotFound(Exception):
     def __init__(self, path):
         message = (
-            "\nI went looking for `" + str(path) + "` but it does not exists."
+            "\nI went looking for `"
+            + str(path)
+            + "` but it does not exists."
             + "\nYou must specify the path of your secrets file."
         )
         super().__init__(message)
 
 
 EDIT_INTRO = """You can edit your secrets now, do not forget to save your changes.
-Waiting for you to close the editor..."""
+Close the editor to proceed."""
 
 EDIT_OUTRO = """Your secrets are safe."""
 
@@ -62,8 +64,7 @@ def edit_secrets(
     intro=EDIT_INTRO,
     outro=EDIT_OUTRO,
 ):
-    """Edit your encrypted secrets in the default text editor.
-    """
+    """Edit your encrypted secrets in the default text editor."""
     path = Path(path)
     if not path.exists():
         raise SecretsNotFound(path)
@@ -170,22 +171,26 @@ def save_secrets(
 
 
 def read_master_key(
-    parent_path,
+    path,
     error_if_not_found=True,
     master_key_file=MASTER_KEY_FILE,
     master_key_env=MASTER_KEY_ENV,
 ):
+    path = Path(path)
     master_key = os.getenv(master_key_env, "").strip().encode("utf8")
     if not master_key:
-        master_key_path = Path(parent_path) / master_key_file
+        master_key_path = path / master_key_file
+        if not master_key_path.is_file():
+            master_key_path = path.parent / master_key_file
         if master_key_path.is_file():
             master_key = master_key_path.read_bytes().strip()
 
     if error_if_not_found and not master_key:
         raise IOError(
-            f"Key not found. Either put a `{master_key_file}` beside your secrets file,"
-            f" or set and environment variable `{master_key_env}` with the master_key"
-            " value (the environment variable takes precendence over the file)."
+            f"Key not found. Either put a `{master_key_file}` beside your"
+            " secrets file, in the parent folder, or set and environment"
+            f" variable `{master_key_env}` with the master_key value"
+            " (the environment variable takes precendence over the file)."
         )
     return master_key
 
@@ -222,7 +227,10 @@ def get_skeleton_header(content):
     try:
         config = toml.loads(content)
     except toml.TomlDecodeError:
-        print("-- WARNING: The encrypted config has syntax errors and isn't a valid TOML file.")
+        print(
+            "-- WARNING: The encrypted config has syntax errors and"
+            " is not a valid TOML file."
+        )
         return ""
 
     sk = get_skeleton(config)
