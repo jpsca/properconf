@@ -38,10 +38,7 @@ class ConfigDict(dict):
         )
 
     def __getattr__(self, key):
-        return self.__getitem__(key)
-
-    def __getitem__(self, key):
-        value = super().__getitem__(key)
+        value = self[key]
         if isinstance(value, dict):
             return self.__class__(value)
         return value

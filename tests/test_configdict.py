@@ -58,3 +58,19 @@ def test_deep_update():
         "foo": "bar",
         "fizz": {"buzz": 3},
     }
+
+
+def test_dot_manual_update_diallowed():
+    config = ConfigDict({"a": {"b": "c"}})
+    with pytest.raises(AttributeError):
+        config.a.b = "x"
+
+
+def test_manual_update():
+    config = ConfigDict({"a": {"b": "c"}})
+
+    config["a"]["b"] = "x"
+    assert config.a.b == "x"
+
+    config["a"] = "z"
+    assert config.a == "z"
