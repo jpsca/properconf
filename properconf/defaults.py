@@ -47,18 +47,20 @@ debug = False
 secret_key = "---- This is a fake secret key just for testing ----"
 """
 
-DEFAULT_INIT = """from pathlib import Path
+DEFAULT_INIT = """import os
+from pathlib import Path
 
 from properconf import ConfigDict
 
-from . import shared, development, production, testing
+from . import shared, development, production, testing  # noqa
 
 
 def load_config(env):
     config = ConfigDict()
-    config.load_object(shared)
+    config.load_module(shared)
 
-    config.load_object(globals().get(env, production))
+    env_config = globals().get(env, production)
+    config.load_module(env_config)
 
     root_path = Path(__file__).parent
     config.load_secrets(root_path / env / "secrets.enc.toml")
