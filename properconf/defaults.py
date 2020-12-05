@@ -12,34 +12,38 @@ DEFAULT_DEVELOPMENT_SECRETS = DEFAULT_SECRETS
 DEFAULT_PRODUCTION_SECRETS = DEFAULT_SECRETS + 'secret_key = "<SECRET_KEY>"\n'
 
 
-DEFAULT_SHARED_CONFIG = """# -------------------------------------------------------------
-# Shared config
-# -------------------------------------------------------------
+DEFAULT_SHARED_CONFIG = """\"\"\"
+Shared config
+\"\"\"
 
-debug = false
+
+debug = False
 """
 
-DEFAULT_DEVELOPMENT_CONFIG = """# -------------------------------------------------------------
-# Development config
-# -------------------------------------------------------------
+DEFAULT_DEVELOPMENT_CONFIG = """\"\"\"
+Development config
+\"\"\"
 
-debug = true
+
+debug = True
 secret_key = "---- This is a fake secret key just for development ----"
 """
 
-DEFAULT_PRODUCTION_CONFIG = """# -------------------------------------------------------------
-# Production config
-# -------------------------------------------------------------
+DEFAULT_PRODUCTION_CONFIG = """\"\"\"
+Production config
+\"\"\"
 
-debug = false
+
+debug = False
 # secret_key = Set in secrets
 """
 
-DEFAULT_TESTING_CONFIG = """# -------------------------------------------------------------
-# Testing config
-# -------------------------------------------------------------
+DEFAULT_TESTING_CONFIG = """\"\"\"
+Testing config
+\"\"\"
 
-debug = false
+
+debug = False
 secret_key = "---- This is a fake secret key just for testing ----"
 """
 
@@ -47,13 +51,18 @@ DEFAULT_INIT = """from pathlib import Path
 
 from properconf import ConfigDict
 
+from . import shared, development, production, testing
+
 
 def load_config(env):
-    root_path = Path(__file__).parent
     config = ConfigDict()
-    config.load_file(root_path / "shared.toml")
-    config.load_file(root_path / env / "config.toml")
+    config.load_object(shared)
+
+    config.load_object(globals().get(env, production))
+
+    root_path = Path(__file__).parent
     config.load_secrets(root_path / env / "secrets.enc.toml")
+
     return config
 
 

@@ -1,5 +1,6 @@
-from pathlib import Path
 import copy
+from inspect import ismodule
+from pathlib import Path
 
 import toml
 
@@ -50,8 +51,27 @@ class ConfigDict(dict):
             src = dict(src)
         self._deepupdate(self, src)
 
+    def load_object(self, obj):
+        """Load values from an object.
+        Ignore values that starts with a double underscore or that are
+        other python modules.
+        """
+        values = {
+            key: value for key, value in obj.__dict__.items()
+            if not key.startswith("__") and not ismodule(value)
+        }
+        self.update(values)
+        return self
+
+    def load_module(self, module):
+        """Load values from an module.
+        Ignore values that starts with a double underscore or that are
+        other python modules.
+        """
+        return self.load_object(module)
+
     def load_file(self, path):
-        """Load values from a config file.
+        """Load values from a TOML config file.
         """
         path = Path(path)
         if path.is_file():
@@ -61,8 +81,7 @@ class ConfigDict(dict):
         return self
 
     def load_secrets(self, secrets_path, default=DEFAULT_SECRETS):
-        """Load values from a config file, and decrypt those values using a
-        key file that should be in the same folder.
+        """Load values from an encrypted config file.
         """
         secrets_path = Path(secrets_path)
         if secrets_path.is_file():
