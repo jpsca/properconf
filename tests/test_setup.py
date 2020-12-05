@@ -10,7 +10,7 @@ def test_setup_all(dst):
     assert (config / "master.key").is_file()
 
     assert (config / "development" / "__init__.py").is_file()
-    assert (config / "development" / "secrets.enc.toml").is_file()
+    assert not (config / "development" / "secrets.enc.toml").is_file()
 
     assert (config / "production" / "__init__.py").is_file()
     assert (config / "production" / "secrets.enc.toml").is_file()

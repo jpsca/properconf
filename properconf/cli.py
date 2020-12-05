@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from pyceo import Manager, ask, confirm, option, param
+from pyceo import Manager, confirm, option, param
 
 from . import secrets as sec
 from .defaults import (
@@ -58,13 +58,6 @@ def setup_all(path="./config", split=False, quiet=False, _app_env="APP_ENV"):
     print("All done! ✨ 🍰 ✨")
 
 
-def setup_shared(root_path, quiet):
-    if not quiet:
-        print(f"Creating {str(root_path / sec.MASTER_KEY_FILE)}")
-    master_key = sec.new_master_key_file(root_path)
-    setup_split(root_path, quiet, master_key)
-
-
 def setup_split(root_path, quiet, master_key=None):
     setup_env(
         root_path / "development",
@@ -73,7 +66,27 @@ def setup_split(root_path, quiet, master_key=None):
         master_key=master_key,
         quiet=quiet,
     )
+    secrets = DEFAULT_PRODUCTION_SECRETS.replace("<SECRET_KEY>", sec.generate_token())
+    setup_env(
+        root_path / "production",
+        config=DEFAULT_PRODUCTION_CONFIG,
+        secrets=secrets,
+        master_key=master_key,
+        quiet=quiet,
+    )
 
+
+def setup_shared(root_path, quiet):
+    if not quiet:
+        print(f"Creating {str(root_path / sec.MASTER_KEY_FILE)}")
+    master_key = sec.new_master_key_file(root_path)
+    setup_env(
+        root_path / "development",
+        config=DEFAULT_DEVELOPMENT_CONFIG,
+        secrets=None,
+        master_key=master_key,
+        quiet=quiet,
+    )
     secrets = DEFAULT_PRODUCTION_SECRETS.replace("<SECRET_KEY>", sec.generate_token())
     setup_env(
         root_path / "production",
@@ -151,10 +164,9 @@ def edit_secrets(path, default=None):
     """
     filepath = Path(path) / ENCRYPTED_FILE
     if not filepath.exists():
-        if ask(f"{filepath} does not exists. Create?"):
+        if confirm(f"{filepath} does not exists. Create?", default=False):
             sec.save_secrets(secrets_path=filepath, content=DEFAULT_SECRETS)
         else:
-            print("Nothing to do")
             return
     sec.edit_secrets(filepath, default=default)
 
