@@ -1,9 +1,9 @@
-from properconf.cli import setup_all
+from properconf.cli import manager
 
 
 def test_setup_all(dst):
     config = dst / "config"
-    setup_all(config)
+    manager.setup().all(config)
 
     assert (config / "__init__.py").is_file()
     assert (config / "shared.py").is_file()
@@ -20,7 +20,7 @@ def test_setup_all(dst):
 
 def test_setup_all_split(dst):
     config = dst / "config"
-    setup_all(config, split=True)
+    manager.setup().all(config, split=True)
 
     assert (config / "__init__.py").is_file()
     assert (config / "shared.py").is_file()
