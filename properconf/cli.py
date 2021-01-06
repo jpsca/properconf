@@ -230,3 +230,4 @@ class Manager(Cli):
 
 
 manager = Manager()
+setup = Setup()
