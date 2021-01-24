@@ -5,7 +5,7 @@ from pathlib import Path
 import toml
 
 from .defaults import DEFAULT_SECRETS
-from .secrets import read_secrets
+from .main import read_key, read_secrets, ENCRYPTED_FILE
 
 
 class ConfigDict(dict):
@@ -70,24 +70,34 @@ class ConfigDict(dict):
         """
         return self.load_object(module)
 
-    def load_file(self, path):
+    def load_file(self, filepath):
         """Load values from a TOML config file.
+        """
+        filepath = Path(filepath)
+        if not filepath.is_file():
+            return self
+
+        content = filepath.read_text()
+        data = self._parse_content(filepath, content)
+        self.update(data)
+        return self
+
+    def load_secrets(self, path, env=""):
+        """Load values from an encrypted config file.
         """
         path = Path(path)
         if path.is_file():
-            content = path.read_text()
-            data = self._parse_content(path, content)
-            self.update(data)
-        return self
+            env = path.split(".", 1)[0]
+            path = path.parent
 
-    def load_secrets(self, secrets_path, default=DEFAULT_SECRETS):
-        """Load values from an encrypted config file.
-        """
-        secrets_path = Path(secrets_path)
-        if secrets_path.is_file():
-            content = read_secrets(secrets_path, default=default)
-            data = self._parse_content(secrets_path, content)
-            self.update(data)
+        secrets_path = path / (ENCRYPTED_FILE % (env, ))
+        if not secrets_path.is_file():
+            return self
+
+        key = read_key(path, env)
+        content = read_secrets(secrets_path, key)
+        data = self._parse_content(secrets_path, content)
+        self.update(data)
         return self
 
     def _deepupdate(self, target, src):
