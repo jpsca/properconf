@@ -3,7 +3,7 @@ import os
 
 import pytest
 
-from properconf import main, defaults
+from properconf import main
 
 
 def test_new_master_key_file(dst):
@@ -43,7 +43,7 @@ def test_key_env_over_file(dst):
 def test_read_secrets(dst):
     key = main.generate_key()
     secrets_path = dst / "main.enc"
-    my_secrets = "This will be encrypted"
+    my_secrets = "# This will be encrypted"
     main.save_secrets(secrets_path, key, my_secrets)
 
     assert main.read_secrets(secrets_path, key) == my_secrets

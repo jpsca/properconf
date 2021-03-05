@@ -40,7 +40,7 @@ from pathlib import Path
 
 from properconf import ConfigDict
 
-from . import shared, development, production, staging, testing
+from . import shared, development, production, testing
 
 
 ENV_VAR = "APP_ENV"
@@ -48,7 +48,6 @@ ENV_FILE = ".APP_ENV"
 ENVIRONMENTS = {
     "development": development,
     "production": production,
-    "staging": staging,
     "testing": testing,
 }
 
@@ -64,13 +63,17 @@ def get_env(default="development"):
 
 def load_config(env):
     config = ConfigDict()
+
+    # Load shared config
     config.load_module(shared)
 
+    # Load env config
     env_config = ENVIRONMENTS.get(env, production)
     config.load_module(env_config)
 
+    # Load env secrets
     path = Path(__file__).parent
-    config.load_secrets(path, env)
+    config.load_secrets(path / env)
 
     return config
 

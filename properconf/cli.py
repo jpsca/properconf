@@ -57,7 +57,7 @@ class Manager(Cli):
 
         - env:
             Name of the environment (e.g.: "development", "production", etc.)
-            It will be used for finding the encrypted file (e.g.: "development.enc.toml")
+            It will be used for finding the encrypted file (e.g.: "development.enc.yaml")
             and the key (e.g.: "development.key").
 
         - quiet [False]:

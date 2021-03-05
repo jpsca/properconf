@@ -8,7 +8,11 @@ from pathlib import Path
 from cryptography.fernet import Fernet
 from pyceo import confirm
 import texteditor
-import toml
+import yaml
+try:
+    from yaml import CLoader as Loader, CDumper as Dumper
+except ImportError: # pragma: no cover
+    from yaml import Loader, Dumper
 
 from .defaults import DEFAULT_SECRETS, DEFAULT_ENCRIPTED_HEADER
 
@@ -26,7 +30,7 @@ __all__ = (
 )
 
 INTRO_MSG = """You can edit your secrets now, do not forget to save your changes."""
-ENCRYPTED_FILE = "%s.enc.toml"
+ENCRYPTED_FILE = "%s.enc.yaml"
 KEY_FILE = "%s.key"
 MASTER_KEY_FILE = "master.key"
 MASTER_KEY_ENV = "MASTER_KEY"
@@ -113,16 +117,16 @@ def save_secrets(filepath, key, content, header=DEFAULT_ENCRIPTED_HEADER):
 
 def get_skeleton_header(content):
     try:
-        config = toml.loads(content)
-    except toml.TomlDecodeError:
+        config = yaml.load(content, Loader=Loader) or {}
+    except (TypeError, ValueError):
         print(
             "-- WARNING: The encrypted config has syntax errors and"
-            " is not a valid TOML file."
+            " is not a valid YAML file."
         )
         return ""
 
     sk = get_skeleton(config)
-    text = toml.dumps(sk).strip()
+    text = yaml.dump(sk, Dumper=Dumper).strip()
     return "#  " + "\n#  ".join(text.split("\n"))
 
 

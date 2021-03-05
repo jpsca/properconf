@@ -2,9 +2,12 @@ import copy
 from inspect import ismodule
 from pathlib import Path
 
-import toml
+import yaml
+try:
+    from yaml import CLoader as Loader
+except ImportError: # pragma: no cover
+    from yaml import Loader
 
-from .defaults import DEFAULT_SECRETS
 from .main import read_key, read_secrets, ENCRYPTED_FILE
 
 
@@ -71,14 +74,16 @@ class ConfigDict(dict):
         return self.load_object(module)
 
     def load_file(self, filepath):
-        """Load values from a TOML config file.
+        """Load values from a YAML file.
         """
         filepath = Path(filepath)
         if not filepath.is_file():
             return self
 
         content = filepath.read_text()
-        data = self._parse_content(filepath, content)
+        data = self._parse_content(content)
+        if not isinstance(data, dict):
+            raise ValueError("Invalid config at " + str(filepath))
         self.update(data)
         return self
 
@@ -96,7 +101,9 @@ class ConfigDict(dict):
 
         key = read_key(path, env)
         content = read_secrets(secrets_path, key)
-        data = self._parse_content(secrets_path, content)
+        data = self._parse_content(content)
+        if not isinstance(data, dict):
+            raise ValueError("Invalid config at " + str(secrets_path))
         self.update(data)
         return self
 
@@ -116,8 +123,5 @@ class ConfigDict(dict):
             else:
                 dict.__setitem__(target, key, copy.copy(value))
 
-    def _parse_content(self, path, content):
-        data = toml.loads(content) or {}
-        if isinstance(data, dict):
-            return data
-        raise ValueError("Invalid config at " + str(path))
+    def _parse_content(self, content):
+        return yaml.load(content, Loader=Loader) or {}

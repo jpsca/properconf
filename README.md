@@ -9,14 +9,14 @@ Use `conf secrets PATH ENV`, e.g.: `conf secrets config/ production`.
 
 This will:
 
-1. Search for a `ENV.enc.toml` encrypted file, e.g.: `production.enc.toml`
+1. Search for a `ENV.enc.yaml` encrypted file, e.g.: `production.enc.yaml`
 
 2. Search for a encription key in this places, in order:
     a) the `MASTER_KEY` environment variable `ENV.key`;
     b) a `ENV.key` file, e.g.: `production.key`;
     c) a `master.key` file.
 
-If an `ENV.enc.toml` encrypted file doesn't exist, it will ask you if it can create an empty one using the encryption key. If it cannot find an encryption key, it also makes a new one in an `ENV.key` file.
+If an `ENV.enc.yaml` encrypted file doesn't exist, it will ask you if it can create an empty one using the encryption key. If it cannot find an encryption key, it also makes a new one in an `ENV.key` file.
 
 Finally, the un-encrypted secrets are loaded in your default text editor so you cna edit them.
 
