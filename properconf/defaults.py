@@ -1,11 +1,12 @@
 DEFAULT_SECRETS = """# -------------------------------------------------------------------
-# This is an encrypted config file in TOML language (https://toml.io)
+# This is an encrypted config file in YAML language
+# (https://en.wikipedia.org/wiki/YAML)
 #
 # Your can safely store here credentials like API keys and such,
 # and commit this file to your source version control system.
 # -------------------------------------------------------------------
 
-# foo = "bar"
+# foo: "bar"
 """
 
 DEFAULT_SHARED_CONFIG = """\"\"\"Shared config\"\"\"
